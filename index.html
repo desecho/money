@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html ng-app="moneyApp">
+<head>
+	<link href="bower/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="style.css" rel="stylesheet">
+
+	<script src="bower/jquery/dist/jquery.min.js"></script>
+	<script src="bower/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="bower/angular/angular.min.js"></script>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Money</title>
+
+	<script>
+
+	var moneyApp = angular.module('moneyApp', []);
+
+	moneyApp.controller('MoneyCtrl', function ($scope) {
+	  $scope.usdToRub = 61;
+	  $scope.hourIncomeInUsd = 0.7;
+	  $scope.taxes = 6;
+	  $scope.workingHours = 8;
+	  $scope.bigMacPrice = 99;
+	  $scope.minRusMonthIncome = Math.round(5965 * (100 - 13) / 100);
+
+	  $scope.calc = function(){
+	  	$scope.actualHourIncomeInUsd = Math.round($scope.hourIncomeInUsd * (100 - $scope.taxes) / 100 * 100) / 100;
+
+	  	$scope.minuteIncomeInUsd = Math.round($scope.actualHourIncomeInUsd / 60 * 100) / 100;
+	  	$scope.dayIncomeInUsd = Math.round($scope.actualHourIncomeInUsd * $scope.workingHours);
+	  	$scope.weekIncomeInUsd = Math.round($scope.dayIncomeInUsd * 5);
+	  	$scope.monthIncomeInUsd = Math.round($scope.weekIncomeInUsd * 4);
+	  	$scope.yearIncomeInUsd = Math.round($scope.monthIncomeInUsd * 12);
+
+	  	$scope.minuteIncomeInRub = Math.round($scope.minuteIncomeInUsd * $scope.usdToRub);
+	  	$scope.hourIncomeInRub = Math.round($scope.actualHourIncomeInUsd * $scope.usdToRub);
+	  	$scope.dayIncomeInRub = Math.round($scope.dayIncomeInUsd * $scope.usdToRub);
+	  	$scope.weekIncomeInRub = Math.round($scope.weekIncomeInUsd * $scope.usdToRub);
+	  	$scope.monthIncomeInRub = Math.round($scope.monthIncomeInUsd * $scope.usdToRub);
+	  	$scope.yearIncomeInRub = Math.round($scope.yearIncomeInUsd * $scope.usdToRub);
+
+	  	$scope.numberOfMinRus = Math.round($scope.monthIncomeInRub / $scope.minRusMonthIncome * 100) / 100
+	  }
+	  $scope.calc();
+	});
+
+	</script>
+</head>
+<body ng-controller="MoneyCtrl">
+
+<div class="row">
+  <div class="col-md-6">
+	<form class="form-horizontal">
+	  <div class="form-group form-group-sm">
+	    <label class="col-sm-2 control-label" for="hourIncomeInUsd">$/hour</label>
+	    <div class="col-sm-2">
+	      <input class="form-control" type="text" id="hourIncomeInUsd" placeholder="$/hour" ng-model="hourIncomeInUsd" ng-change="calc()">
+	    </div>
+	  </div>
+  <div class="form-group form-group-sm">
+    <label class="col-sm-2 control-label" for="taxes">Taxes (%)</label>
+    <div class="col-sm-2">
+      <input class="form-control" type="text" id="taxes" placeholder="Taxes (%)" ng-model="taxes" ng-change="calc()">
+    </div>
+  </div>
+  <div class="form-group form-group-sm">
+    <label class="col-sm-2 control-label" for="usdToRub">$ -> ₽</label>
+    <div class="col-sm-2">
+      <input class="form-control" type="text" id="usdToRub" placeholder="$ -> ₽" ng-model="usdToRub" ng-change="calc()">
+    </div>
+  </div>
+  <div class="form-group form-group-sm">
+    <label class="col-sm-2 control-label" for="bigMacPrice">Big Mac</label>
+    <div class="col-sm-2">
+      <input class="form-control" type="text" id="bigMacPrice" placeholder="Big Mac" ng-model="bigMacPrice" ng-change="calc()">
+    </div>
+  </div>
+  <div class="form-group form-group-sm">
+    <label class="col-sm-2 control-label" for="minRusMonthIncome">Min Monthly Salary in Russia (₽)</label>
+    <div class="col-sm-2">
+      <input class="form-control" type="text" id="minRusMonthIncome" placeholder="Min Monthly Salary in Russia (₽)" ng-model="minRusMonthIncome" ng-change="calc()">
+    </div>
+  </div>
+  <div class="form-group form-group-sm">
+    <label class="col-sm-2 control-label" for="workingHours">Working Hours</label>
+    <div class="col-sm-2">
+      <input class="form-control" type="text" id="workingHours" placeholder="Working Hours" ng-model="workingHours" ng-change="calc()">
+    </div>
+  </div>
+	</form>
+  </div>
+  <div class="col-md-6">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Income</h3>
+  </div>
+  <div class="panel-body">
+		<table class="table">
+			<tr>
+				<th>Period</th>
+				<th>₽</th>
+				<th>$</th>
+			</tr>
+			<tr>
+				<td>Year</td>
+				<td>{{ yearIncomeInRub }}₽</td>
+				<td>{{ yearIncomeInUsd }}$</td>
+			</tr>
+			<tr>
+				<td>Month</td>
+				<td>{{ monthIncomeInRub }}₽</td>
+				<td>{{ monthIncomeInUsd }}$</td>
+			</tr>
+			<tr>
+				<td>Week</td>
+				<td>{{ weekIncomeInRub }}₽</td>
+				<td>{{ weekIncomeInUsd }}$</td>
+			</tr>
+			<tr>
+				<td>Day</td>
+				<td>{{ dayIncomeInRub }}₽</td>
+				<td>{{ dayIncomeInUsd }}$</td>
+			</tr>
+			<tr>
+				<td>Hour</td>
+				<td>{{ hourIncomeInRub }}₽</td>
+				<td>{{ hourIncomeInUsd }}$</td>
+			</tr>
+			<tr>
+				<td>Minute</td>
+				<td>{{ minuteIncomeInRub }}₽</td>
+				<td>{{ minuteIncomeInUsd }}$</td>
+			</tr>
+		</table>
+		Number of minimal russian salaries you get in a month - {{ numberOfMinRus }}<br>
+		Actual hourly income - {{ actualHourIncomeInUsd }}$
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+
+</body>
+</html>
