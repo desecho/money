@@ -18,30 +18,45 @@
 	var moneyApp = angular.module('moneyApp', []);
 
 	moneyApp.controller('MoneyCtrl', function ($scope) {
+
+		function round(number, n) {
+			n = typeof n !== 'undefined' ? n : false;
+			if (n) {
+				x = Math.pow(10, n);
+			} else {
+				x = 1;
+			}
+			return Math.round(number * x) / x;
+		}
+
 	  $scope.usdToRub = 61;
-	  $scope.hourIncomeInUsd = 0.7;
+	  $scope.bigMacPrice = 99;
+	  $scope.minRusMonthIncome = round(5965 * (100 - 13) / 100);
+	  $scope.iphonePrice = 49990;
+
+	  $scope.hourIncomeInUsdBeforeTaxes = 0.7;
 	  $scope.taxes = 6;
 	  $scope.workingHours = 8;
-	  $scope.bigMacPrice = 99;
-	  $scope.minRusMonthIncome = Math.round(5965 * (100 - 13) / 100);
 
 	  $scope.calc = function(){
-	  	$scope.actualHourIncomeInUsd = Math.round($scope.hourIncomeInUsd * (100 - $scope.taxes) / 100 * 100) / 100;
+	  	$scope.hourIncomeInUsd = round($scope.hourIncomeInUsdBeforeTaxes * (100 - $scope.taxes) / 100, 2);
 
-	  	$scope.minuteIncomeInUsd = Math.round($scope.actualHourIncomeInUsd / 60 * 100) / 100;
-	  	$scope.dayIncomeInUsd = Math.round($scope.actualHourIncomeInUsd * $scope.workingHours);
-	  	$scope.weekIncomeInUsd = Math.round($scope.dayIncomeInUsd * 5);
-	  	$scope.monthIncomeInUsd = Math.round($scope.weekIncomeInUsd * 4);
-	  	$scope.yearIncomeInUsd = Math.round($scope.monthIncomeInUsd * 12);
+	  	$scope.minuteIncomeInUsd = round($scope.hourIncomeInUsd / 60, 2)
+	  	$scope.dayIncomeInUsd = round($scope.hourIncomeInUsd * $scope.workingHours);
+	  	$scope.weekIncomeInUsd = round($scope.dayIncomeInUsd * 5);
+	  	$scope.monthIncomeInUsd = round($scope.weekIncomeInUsd * 4);
+	  	$scope.yearIncomeInUsd = round($scope.monthIncomeInUsd * 12);
 
-	  	$scope.minuteIncomeInRub = Math.round($scope.minuteIncomeInUsd * $scope.usdToRub);
-	  	$scope.hourIncomeInRub = Math.round($scope.actualHourIncomeInUsd * $scope.usdToRub);
-	  	$scope.dayIncomeInRub = Math.round($scope.dayIncomeInUsd * $scope.usdToRub);
-	  	$scope.weekIncomeInRub = Math.round($scope.weekIncomeInUsd * $scope.usdToRub);
-	  	$scope.monthIncomeInRub = Math.round($scope.monthIncomeInUsd * $scope.usdToRub);
-	  	$scope.yearIncomeInRub = Math.round($scope.yearIncomeInUsd * $scope.usdToRub);
+	  	$scope.minuteIncomeInRub = round($scope.minuteIncomeInUsd * $scope.usdToRub, 2);
+	  	$scope.hourIncomeInRub = round($scope.hourIncomeInUsd * $scope.usdToRub);
+	  	$scope.dayIncomeInRub = round($scope.dayIncomeInUsd * $scope.usdToRub);
+	  	$scope.weekIncomeInRub = round($scope.weekIncomeInUsd * $scope.usdToRub);
+	  	$scope.monthIncomeInRub = round($scope.monthIncomeInUsd * $scope.usdToRub);
+	  	$scope.yearIncomeInRub = round($scope.yearIncomeInUsd * $scope.usdToRub);
 
-	  	$scope.numberOfMinRus = Math.round($scope.monthIncomeInRub / $scope.minRusMonthIncome * 100) / 100
+	  	$scope.numberOfMinRus = round($scope.monthIncomeInRub / $scope.minRusMonthIncome, 2)
+	  	$scope.timeForBigMac = Math.floor($scope.bigMacPrice / $scope.minuteIncomeInRub) + 1;
+	  	$scope.timeForIphone = round($scope.iphonePrice / $scope.dayIncomeInRub, 1);
 	  }
 	  $scope.calc();
 	});
@@ -53,34 +68,16 @@
 <div class="row">
   <div class="col-md-6">
 	<form class="form-horizontal">
-	  <div class="form-group form-group-sm">
-	    <label class="col-sm-2 control-label" for="hourIncomeInUsd">$/hour</label>
+  	  <div class="form-group form-group-sm" >
+	    <label class="col-sm-2 control-label" for="hourIncomeInUsdBeforeTaxes">$/hour</label>
 	    <div class="col-sm-2">
-	      <input class="form-control" type="text" id="hourIncomeInUsd" placeholder="$/hour" ng-model="hourIncomeInUsd" ng-change="calc()">
+	      <input class="form-control" type="text" id="hourIncomeInUsdBeforeTaxes" placeholder="$/hour" ng-model="hourIncomeInUsdBeforeTaxes" ng-change="calc()">
 	    </div>
 	  </div>
   <div class="form-group form-group-sm">
     <label class="col-sm-2 control-label" for="taxes">Taxes (%)</label>
     <div class="col-sm-2">
       <input class="form-control" type="text" id="taxes" placeholder="Taxes (%)" ng-model="taxes" ng-change="calc()">
-    </div>
-  </div>
-  <div class="form-group form-group-sm">
-    <label class="col-sm-2 control-label" for="usdToRub">$ -> ₽</label>
-    <div class="col-sm-2">
-      <input class="form-control" type="text" id="usdToRub" placeholder="$ -> ₽" ng-model="usdToRub" ng-change="calc()">
-    </div>
-  </div>
-  <div class="form-group form-group-sm">
-    <label class="col-sm-2 control-label" for="bigMacPrice">Big Mac</label>
-    <div class="col-sm-2">
-      <input class="form-control" type="text" id="bigMacPrice" placeholder="Big Mac" ng-model="bigMacPrice" ng-change="calc()">
-    </div>
-  </div>
-  <div class="form-group form-group-sm">
-    <label class="col-sm-2 control-label" for="minRusMonthIncome">Min Monthly Salary in Russia (₽)</label>
-    <div class="col-sm-2">
-      <input class="form-control" type="text" id="minRusMonthIncome" placeholder="Min Monthly Salary in Russia (₽)" ng-model="minRusMonthIncome" ng-change="calc()">
     </div>
   </div>
   <div class="form-group form-group-sm">
@@ -126,7 +123,7 @@
 			<tr>
 				<td>Hour</td>
 				<td>{{ hourIncomeInRub }}₽</td>
-				<td>{{ actualHourIncomeInUsd }}$</td>
+				<td>{{ hourIncomeInUsd }}$</td>
 			</tr>
 			<tr>
 				<td>Minute</td>
@@ -135,12 +132,45 @@
 			</tr>
 		</table>
 		Number of minimal russian salaries you get in a month - {{ numberOfMinRus }}<br>
+		Time in which you earn a Big Mac - {{ timeForBigMac }} min<br>
+		Time in which you earn an iPhone - {{ timeForIphone }} days
   </div>
+
+</div>
+  </div>
+  <div class="col-md-12">
+	<form class="form-horizontal">
+		<div class="form-group form-group-sm">
+	    <label class="col-sm-2 control-label" for="usdToRub">$ -> ₽</label>
+	    <div class="col-sm-2">
+	      <input class="form-control" type="text" id="usdToRub" placeholder="$ -> ₽" ng-model="usdToRub" ng-change="calc()">
+	    </div>
+	  </div>
+	  <div class="form-group form-group-sm">
+	    <label class="col-sm-2 control-label" for="bigMacPrice">Big Mac Price (₽)</label>
+	    <div class="col-sm-2">
+	      <input class="form-control" type="text" id="bigMacPrice" placeholder="Big Mac Price (₽)" ng-model="bigMacPrice" ng-change="calc()">
+	    </div>
+	  </div>
+	  <div class="form-group form-group-sm">
+	    <label class="col-sm-2 control-label" for="iphonePrice">iPhone Price (₽)</label>
+	    <div class="col-sm-2">
+	      <input class="form-control" type="text" id="iphonePrice" placeholder="iPhone Price (₽)" ng-model="iphonePrice" ng-change="calc()">
+	    </div>
+	  </div>
+	  <div class="form-group form-group-sm">
+	    <label class="col-sm-2 control-label" for="minRusMonthIncome">Min Monthly Salary in Russia (₽)</label>
+	    <div class="col-sm-2">
+	      <input class="form-control" type="text" id="minRusMonthIncome" placeholder="Min Monthly Salary in Russia (₽)" ng-model="minRusMonthIncome" ng-change="calc()">
+	    </div>
+	  </div>
+</form>
 </div>
 
 
-  </div>
 </div>
+
+
 
 
 </body>
